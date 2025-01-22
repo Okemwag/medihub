@@ -1,0 +1,27 @@
+services:
+  medihub:
+    build:
+      context: .
+      args:
+        GIT_COMMIT: "${GIT_COMMIT}"
+    image: medihub:latest
+    container_name: medihub
+    ports:
+      - "8000:8000"
+    environment:
+      - GIT_COMMIT=${GIT_COMMIT}
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: postgres:latest
+    container_name: medihub_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  postgres_data:
+    driver: local

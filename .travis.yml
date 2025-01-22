@@ -1,0 +1,25 @@
+language: go
+
+# Specify Go versions to test against
+go:
+  - "1.21"
+  - "1.22"
+  - "1.23"
+
+# Install dependencies (if needed)
+install:
+  - go mod download
+
+# Run tests
+script:
+  - go test -v ./...
+
+# Cache Go modules to speed up builds
+cache:
+  directories:
+    - $GOPATH/pkg/mod
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
