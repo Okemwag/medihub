@@ -15,6 +15,8 @@ help:
 	@echo "For more information, RTFM!"
 
 
+APP_NAME=medihub
+
 build:
 	@echo "Building the application..."
 	@go build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
