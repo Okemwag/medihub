@@ -42,16 +42,19 @@ func main() {
 	seeder.SeedUsers()
 
 	// Initialize AuthService and AuthController
-	jwtSecret := ""
+	jwtSecret := "your_jwt_secret" // Replace with your actual JWT secret
 	tokenExpiry := 24 * time.Hour
 	authService := services.NewAuthService(jwtSecret, tokenExpiry)
 	authController := controllers.NewAuthController(authService)
+
+	// Initialize PatientController
+	patientController := controllers.NewPatientController(database.DB)
 
 	// Initialize Gin router
 	router := gin.Default()
 
 	// Register routes
-	routes.RegisterRoutes(router, authController, jwtSecret)
+	routes.RegisterRoutes(router, authController, patientController, jwtSecret)
 
 	// Start the server
 	port := "8000"

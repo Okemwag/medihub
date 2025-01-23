@@ -1,25 +1,44 @@
-FROM golang:1.23.4-alpine3.21 AS builder
-RUN apk add --no-cache gcc musl-dev git build-base pkgconfig libsodium-dev
+# Use the official Golang image as the base image
+FROM golang:1.23-alpine AS builder
 
-ENV GOOS=linux
+# Install Air for live reloading
+RUN go install github.com/air-verse/air@latest
 
-WORKDIR /etc/medihub/
+# Set the working directory inside the container
+WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+# Copy the Go module files
+COPY go.mod go.sum ./
+
+# Download dependencies
 RUN go mod download
 
+# Copy the rest of the application code
 COPY . .
-RUN --mount=type=cache,target=/root/.cache/go-build \
-  go build -o medihub cmd/medihub/main.go
 
-FROM alpine:3.21
-RUN apk add libsodium-dev
-COPY --from=builder /etc/medihub/medihub .
-COPY migrations migrations
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o medihub ./cmd/medihub
 
+# Use a minimal Alpine image for the final stage
+FROM alpine:latest
 
-ARG GIT_COMMIT
-ENV GIT_COMMIT=$GIT_COMMIT
+# Set the working directory
+WORKDIR /app
 
-CMD ["./medihub"]
+# Copy the binary from the builder stage
+COPY --from=builder /app/medihub .
+
+# Copy the migrations directory
+COPY ./migrations ./migrations
+
+# Copy the .env file
+COPY .env .
+
+# Copy the Air binary from the builder stage
+COPY --from=builder /go/bin/air /usr/local/bin/air
+
+# Expose the application port
+EXPOSE 8000
+
+# Command to run the application
+CMD ["air", "-c", ".air.toml"]
