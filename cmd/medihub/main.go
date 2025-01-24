@@ -1,3 +1,5 @@
+
+
 package main
 
 import (
@@ -17,6 +19,7 @@ import (
 	"github.com/Okemwag/medihub/pkg/config"
 	"github.com/Okemwag/medihub/pkg/database"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 // @title Medihub API
@@ -63,6 +66,15 @@ func main() {
 
 	// Initialize Gin router
 	router := gin.Default()
+
+	// Configure CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"}, // Allow requests from this origin
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allowed HTTP methods
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Allowed headers
+		ExposeHeaders:    []string{"Content-Length"}, // Exposed headers
+		AllowCredentials: true, // Allow credentials (e.g., cookies)
+	}))
 
 	// Register routes
 	routes.RegisterRoutes(router, authController, patientController, jwtSecret)
