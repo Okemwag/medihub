@@ -19,6 +19,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title Medihub API
+// @version 1.0
+// @description This is the API documentation for the Medihub application.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email support@medihub.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8000
+// @BasePath /
 func main() {
 	// Load configuration
 	cfg := config.LoadConfig()
@@ -43,7 +53,7 @@ func main() {
 	seeder.SeedUsers()
 
 	// Initialize AuthService and AuthController
-	jwtSecret := os.Getenv("JWT_SECRET") 
+	jwtSecret := os.Getenv("JWT_SECRET") // Retrieve JWT secret from environment variables
 	tokenExpiry := 24 * time.Hour
 	authService := services.NewAuthService(jwtSecret, tokenExpiry)
 	authController := controllers.NewAuthController(authService)
@@ -65,13 +75,15 @@ func main() {
 	}
 }
 
-// runMigrations reads and executes .sql files from the migrations folder
+// runMigrations reads and executes .sql files from the migrations folder.
 func runMigrations(db *sql.DB, migrationsDir string) error {
+	// Read all files in the migrations directory
 	files, err := ioutil.ReadDir(migrationsDir)
 	if err != nil {
 		return err
 	}
 
+	// Filter and sort .sql files
 	var sqlFiles []string
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".sql") {
@@ -88,6 +100,7 @@ func runMigrations(db *sql.DB, migrationsDir string) error {
 			return err
 		}
 
+		// Execute SQL content, log non-critical errors
 		if _, err := db.Exec(string(sqlContent)); err != nil {
 			if strings.Contains(err.Error(), "relation already exists") {
 				log.Printf("Skipping migration %s: %v", file, err)

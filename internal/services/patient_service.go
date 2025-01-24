@@ -9,14 +9,25 @@ import (
 	"github.com/Okemwag/medihub/internal/models"
 )
 
+// PatientService provides methods for managing patient records in the database.
 type PatientService struct {
 	db *sql.DB
 }
 
+// NewPatientService creates a new instance of PatientService.
+//
+// @param db *sql.DB: A database connection.
+// @return *PatientService: A new PatientService instance.
 func NewPatientService(db *sql.DB) *PatientService {
 	return &PatientService{db: db}
 }
 
+// CreatePatient adds a new patient record to the database.
+//
+// @param ctx context.Context: The context for the request.
+// @param patient *models.Patient: The patient data to create.
+// @return int64: The ID of the newly created patient.
+// @return error: An error if the operation fails.
 func (s *PatientService) CreatePatient(ctx context.Context, patient *models.Patient) (int64, error) {
 	query := `
 		INSERT INTO patients (first_name, last_name, date_of_birth, gender, contact_number, email, address, medical_history, created_by, updated_by)
@@ -43,6 +54,12 @@ func (s *PatientService) CreatePatient(ctx context.Context, patient *models.Pati
 	return id, nil
 }
 
+// GetPatient retrieves a patient record from the database by ID.
+//
+// @param ctx context.Context: The context for the request.
+// @param id int64: The ID of the patient to retrieve.
+// @return *models.Patient: The patient record.
+// @return error: An error if the patient is not found or the operation fails.
 func (s *PatientService) GetPatient(ctx context.Context, id int64) (*models.Patient, error) {
 	query := `
 		SELECT id, first_name, last_name, date_of_birth, gender, contact_number, email, address, medical_history, created_by, updated_by, created_at, updated_at
@@ -75,6 +92,12 @@ func (s *PatientService) GetPatient(ctx context.Context, id int64) (*models.Pati
 	return &patient, nil
 }
 
+// UpdatePatient updates an existing patient record in the database.
+//
+// @param ctx context.Context: The context for the request.
+// @param id int64: The ID of the patient to update.
+// @param patient *models.Patient: The updated patient data.
+// @return error: An error if the operation fails.
 func (s *PatientService) UpdatePatient(ctx context.Context, id int64, patient *models.Patient) error {
 	query := `
 		UPDATE patients
@@ -100,6 +123,11 @@ func (s *PatientService) UpdatePatient(ctx context.Context, id int64, patient *m
 	return nil
 }
 
+// DeletePatient removes a patient record from the database by ID.
+//
+// @param ctx context.Context: The context for the request.
+// @param id int64: The ID of the patient to delete.
+// @return error: An error if the operation fails.
 func (s *PatientService) DeletePatient(ctx context.Context, id int64) error {
 	query := `DELETE FROM patients WHERE id = $1`
 	_, err := s.db.ExecContext(ctx, query, id)
