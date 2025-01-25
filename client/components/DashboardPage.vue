@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import {
   Users,
   Calendar,
@@ -26,9 +26,9 @@ const setActiveRole = (role) => {
 };
 
 const receptionistMenuItems = [
-  { icon: UserPlus, label: "Register Patient", route: "/register-patient" },
-  { icon: Users, label: "Patient List", route: "/patient-list" },
-  { icon: Calendar, label: "Appointments", route: "/appointments" },
+  { icon: UserPlus, label: "Register Patient" },
+  { icon: Users, label: "Patient List" },
+  { icon: Calendar, label: "Appointments" },
 ];
 
 const doctorMenuItems = [
@@ -86,6 +86,33 @@ const dashboardCards = computed(() => {
     ];
   }
 });
+
+const modals = reactive({
+  registerPatient: false,
+  appointments: false,
+  patientList: false,
+});
+
+const handleMenuAction = (label) => {
+  switch (label) {
+    case "Register Patient":
+      modals.registerPatient = true;
+      break;
+    case "Appointments":
+      modals.appointments = true;
+      break;
+    case "Patient List":
+      break;
+  }
+};
+
+// const submitPatientRegistration = async () => {
+  
+// };
+
+const closeModal = (modalName) => {
+  modals[modalName] = false;
+};
 </script>
 <template>
   <div class="flex flex-col md:flex-row h-screen bg-gray-100">
@@ -130,7 +157,7 @@ const dashboardCards = computed(() => {
       <!-- Desktop User Profile -->
       <div class="hidden md:flex items-center p-6">
         <img
-          src="/api/placeholder/60/60"
+          src="https://pixabay.com/photos/doctor-gray-hair-experience-doctor-2337835/"
           alt="User Profile"
           class="w-12 h-12 rounded-full mr-4"
         />
@@ -160,7 +187,7 @@ const dashboardCards = computed(() => {
       </div>
 
       <!-- Menu Items -->
-      <nav class="p-2">
+      <!-- <nav class="p-2">
         <div
           v-for="item in menuItems"
           :key="item.label"
@@ -170,15 +197,40 @@ const dashboardCards = computed(() => {
           <span class="text-sm">{{ item.label }}</span>
         </div>
 
-        <!-- Logout -->
-        <div
+         Logout -->
+      <!-- <div
           class="flex items-center p-3 hover:bg-gray-100 rounded-lg cursor-pointer text-red-600 mt-4"
         >
           <LogOut class="mr-3" :size="20" />
           <span>Logout</span>
         </div>
+      </nav> -->
+      <!-- Menu Items as Buttons -->
+      <nav class="p-2">
+        <button
+          v-for="item in menuItems"
+          :key="item.label"
+          @click="handleMenuAction(item.label)"
+          class="w-full flex items-center p-3 hover:bg-gray-100 rounded-lg text-left cursor-pointer"
+        >
+          <component :is="item.icon" class="mr-3" :size="20" />
+          <span class="text-sm">{{ item.label }}</span>
+        </button>
+
+        <button
+          @click="logout"
+          class="w-full flex items-center p-3 hover:bg-gray-100 rounded-lg text-red-600"
+        >
+          <LogOut class="mr-3" :size="20" />
+          <span>Logout</span>
+        </button>
       </nav>
     </div>
+
+    <RegisterPatientModal
+      :is-open="modals.registerPatient"
+      @close="closeModal('registerPatient')"
+    />
 
     <!-- Main Content -->
     <div class="flex-1 p-4 md:p-8 overflow-y-auto">

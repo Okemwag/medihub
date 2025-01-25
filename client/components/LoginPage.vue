@@ -87,10 +87,10 @@ const password = ref("");
 const role = ref("receptionist");
 
 const handleLogin = async () => {
-  // Implement login logic here
+  const API_URL = useRuntimeConfig().public.API_BASE_URL;
+  console.log("API_URL:", API_URL);
   try {
-    // Send login request to the server
-    const response = await fetch("http://localhost:8000/login", {
+    const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,6 +101,16 @@ const handleLogin = async () => {
         // role: role.value,
       }),
     });
+
+    if (response.status === 200) {
+      // Login successful
+      console.log("Login successful", response);
+      // sessionStorage.setItem("token", response.data.token);
+      navigateTo("/dashboard");
+    } else {
+      // Login failed
+      console.error("Login failed");
+    }
     console.log("Login response:", response);
   } catch (error) {
     console.error("Login failed:", error);
