@@ -102,9 +102,12 @@ const handleLogin = async () => {
       }),
     });
 
+    const data = await response.json();
+    console.log("Data:", data);
+
     if (response.status === 200) {
       // Login successful
-      console.log("Login successful", response);
+      console.log("Login successful",);
       // sessionStorage.setItem("token", response.data.token);
       navigateTo("/dashboard");
     } else {

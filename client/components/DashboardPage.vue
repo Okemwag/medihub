@@ -11,6 +11,7 @@ import {
   Menu,
   X,
 } from "lucide-vue-next";
+import PatientListModal from "./patientListModal.vue";
 
 const userName = ref("John Doe");
 const activeRole = ref("receptionist");
@@ -90,7 +91,7 @@ const dashboardCards = computed(() => {
 const modals = reactive({
   registerPatient: false,
   appointments: false,
-  patientList: false,
+  patientsList: false,
 });
 
 const handleMenuAction = (label) => {
@@ -102,12 +103,13 @@ const handleMenuAction = (label) => {
       modals.appointments = true;
       break;
     case "Patient List":
+      modals.patientsList = true;
       break;
   }
 };
 
 // const submitPatientRegistration = async () => {
-  
+
 // };
 
 const closeModal = (modalName) => {
@@ -186,26 +188,7 @@ const closeModal = (modalName) => {
         </button>
       </div>
 
-      <!-- Menu Items -->
-      <!-- <nav class="p-2">
-        <div
-          v-for="item in menuItems"
-          :key="item.label"
-          class="flex items-center p-3 hover:bg-gray-100 rounded-lg cursor-pointer"
-        >
-          <component :is="item.icon" class="mr-3" :size="20" />
-          <span class="text-sm">{{ item.label }}</span>
-        </div>
-
-         Logout -->
-      <!-- <div
-          class="flex items-center p-3 hover:bg-gray-100 rounded-lg cursor-pointer text-red-600 mt-4"
-        >
-          <LogOut class="mr-3" :size="20" />
-          <span>Logout</span>
-        </div>
-      </nav> -->
-      <!-- Menu Items as Buttons -->
+      <!-- Menu Items  -->
       <nav class="p-2">
         <button
           v-for="item in menuItems"
@@ -230,6 +213,11 @@ const closeModal = (modalName) => {
     <RegisterPatientModal
       :is-open="modals.registerPatient"
       @close="closeModal('registerPatient')"
+    />
+
+    <PatientListModal
+      :is-open="modals.patientsList"
+      @close="closeModal('patientsList')"
     />
 
     <!-- Main Content -->
