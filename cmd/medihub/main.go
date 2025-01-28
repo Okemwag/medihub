@@ -65,9 +65,9 @@ func main() {
 
 	// Configure CORS middleware
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, // Allow requests from this origin
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allowed HTTP methods
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Allowed headers
+		AllowOrigins:     []string{"http://localhost:3000"}, 
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, 
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, 
 		ExposeHeaders:    []string{"Content-Length"}, // Exposed headers
 		AllowCredentials: true, // Allow credentials (e.g., cookies)
 	}))
