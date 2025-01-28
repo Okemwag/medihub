@@ -1,15 +1,9 @@
-
-
 package main
 
 import (
 	"database/sql"
-	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
-	"sort"
-	"strings"
 	"time"
 
 	"github.com/Okemwag/medihub/internal/controllers"
@@ -20,6 +14,8 @@ import (
 	"github.com/Okemwag/medihub/pkg/database"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	_ "github.com/lib/pq" // PostgreSQL driver
+	"github.com/pressly/goose/v3"
 )
 
 // @title Medihub API
@@ -45,7 +41,7 @@ func main() {
 		}
 	}(database.DB)
 
-	// Run migrations
+	// Run migrations using Goose
 	if err := runMigrations(database.DB, "./migrations"); err != nil {
 		log.Printf("Warning: Error running migrations: %v", err)
 		log.Println("Proceeding to start the server...")
@@ -87,39 +83,16 @@ func main() {
 	}
 }
 
-// runMigrations reads and executes .sql files from the migrations folder.
+// runMigrations runs database migrations using Goose.
 func runMigrations(db *sql.DB, migrationsDir string) error {
-	// Read all files in the migrations directory
-	files, err := ioutil.ReadDir(migrationsDir)
-	if err != nil {
+	// Set the dialect for Goose (PostgreSQL in this case)
+	if err := goose.SetDialect("postgres"); err != nil {
 		return err
 	}
 
-	// Filter and sort .sql files
-	var sqlFiles []string
-	for _, file := range files {
-		if strings.HasSuffix(file.Name(), ".sql") {
-			sqlFiles = append(sqlFiles, filepath.Join(migrationsDir, file.Name()))
-		}
-	}
-	sort.Strings(sqlFiles)
-
-	// Execute each SQL file
-	for _, file := range sqlFiles {
-		log.Printf("Executing migration: %s", file)
-		sqlContent, err := ioutil.ReadFile(file)
-		if err != nil {
-			return err
-		}
-
-		// Execute SQL content, log non-critical errors
-		if _, err := db.Exec(string(sqlContent)); err != nil {
-			if strings.Contains(err.Error(), "relation already exists") {
-				log.Printf("Skipping migration %s: %v", file, err)
-				continue
-			}
-			return err
-		}
+	// Run migrations
+	if err := goose.Up(db, migrationsDir); err != nil {
+		return err
 	}
 
 	log.Println("Migrations executed successfully.")
