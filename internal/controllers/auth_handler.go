@@ -28,7 +28,7 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Accept json
 // @Produce json
 // @Param request body struct{Username string; Password string} true "Login credentials"
-// @Success 200 {object} map[string]string "Returns the JWT token"
+// @Success 200 {object} services.LoginResponse "Returns the JWT token"
 // @Failure 400 {object} map[string]string "Invalid request payload"
 // @Failure 401 {object} map[string]string "Invalid username or password"
 // @Router /login [post]
@@ -45,13 +45,14 @@ func (ctrl *AuthController) Login(c *gin.Context) {
 	}
 
 	// Authenticate the user and generate a JWT token
-	token, err := ctrl.authService.Login(req.Username, req.Password)
+	response, err := ctrl.authService.Login(req.Username, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// Return the token in the response
+	c.JSON(http.StatusOK, response)
 }
 
 // Logout handles user logout. For stateless JWT, this typically involves client-side token invalidation.
