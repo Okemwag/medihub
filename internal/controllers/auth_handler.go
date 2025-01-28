@@ -20,7 +20,7 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 	return &AuthController{authService: authService}
 }
 
-// Login authenticates a user and returns a JWT token upon successful authentication.
+// Login authenticates a user and returns a JWT token and user details upon successful authentication.
 //
 // @Summary Authenticate a user
 // @Description Authenticate a user with the provided username and password
@@ -28,7 +28,7 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Accept json
 // @Produce json
 // @Param request body struct{Username string; Password string} true "Login credentials"
-// @Success 200 {object} services.LoginResponse "Returns the JWT token"
+// @Success 200 {object} services.LoginResponse "Returns the JWT token and user details"
 // @Failure 400 {object} map[string]string "Invalid request payload"
 // @Failure 401 {object} map[string]string "Invalid username or password"
 // @Router /login [post]
@@ -51,7 +51,7 @@ func (ctrl *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	// Return the token in the response
+	// Return the token and user details in the response
 	c.JSON(http.StatusOK, response)
 }
 

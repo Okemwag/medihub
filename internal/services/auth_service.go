@@ -32,23 +32,27 @@ func NewAuthService(jwtSecret string, tokenExpiry time.Duration) *AuthService {
 
 // LoginResponse represents the response structure for a successful login.
 type LoginResponse struct {
-	Token string `json:"token"` // JWT token for authenticated user
+	Token  string `json:"token"`  // JWT token for authenticated user
+	Name   string `json:"name"`   // Full name of the user
+	UserID int64  `json:"user_id"` // ID of the user
+	Role   string `json:"role"`   // Role of the user
 }
 
 // Login authenticates a user and generates a JWT token upon successful authentication.
 //
 // @param username string: The username of the user.
 // @param password string: The password of the user.
-// @return LoginResponse: The response containing the JWT token.
+// @return LoginResponse: The response containing the JWT token and user details.
 // @return error: An error if authentication fails or token generation fails.
 func (s *AuthService) Login(username, password string) (LoginResponse, error) {
 	var storedPassword string
 	var role string
 	var userID int64
+	var name string
 
-	// Query the database for the user's credentials
-	query := `SELECT id, password_hash, role_id FROM users WHERE username = $1`
-	err := s.db.QueryRow(query, username).Scan(&userID, &storedPassword, &role)
+	// Query the database for the user's credentials and details
+	query := `SELECT id, name, password_hash, role_id FROM users WHERE username = $1`
+	err := s.db.QueryRow(query, username).Scan(&userID, &name, &storedPassword, &role)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return LoginResponse{}, errors.New("invalid username or password")
@@ -67,18 +71,13 @@ func (s *AuthService) Login(username, password string) (LoginResponse, error) {
 		return LoginResponse{}, errors.New("failed to generate token: " + err.Error())
 	}
 
-	// Return the token in the response
-	return LoginResponse{Token: token}, nil
-}
-
-// Logout handles user logout. For stateless JWT, this typically involves client-side token invalidation.
-//
-// @param userID int64: The ID of the user logging out.
-// @return error: An error if the logout process fails (not applicable for stateless JWT).
-func (s *AuthService) Logout(userID int64) error {
-	// For stateless JWT, logout would mean invalidating the token on the client side or maintaining a blacklist.
-	// Implement logic to handle this if using session-based JWT (e.g., Redis blacklist).
-	return nil
+	// Return the token and user details in the response
+	return LoginResponse{
+		Token:  token,
+		Name:   name,
+		UserID: userID,
+		Role:   role,
+	}, nil
 }
 
 // generateJWT generates a JWT token for the given user ID and role.
