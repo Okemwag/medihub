@@ -60,18 +60,21 @@ const submitRegistration = async () => {
     }
 
     const API_URL = useRuntimeConfig().public.API_BASE_URL;
-    console.log("API_URL:", API_URL);
+    // console.log("API_URL:", API_URL);
     try {
       const response = await fetch(`${API_URL}/patients`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           patient,
         }),
       });
 
+      const data = response.json();
+      console.log("data:", data);
       if (response.status === 200) {
         // Registration successful
         console.log("Patient registered successfully");

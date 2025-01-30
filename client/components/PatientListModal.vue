@@ -37,11 +37,24 @@ const itemsPerPage = ref(10);
 
 // Func to fetch patients
 const fetchPatients = async () => {
+  const authToken = sessionStorage.getItem("token");
   const API_URL =
     useRuntimeConfig().public.API_BASE_URL || "http://localhost:8000";
-  console.log("API_URL:", API_URL);
+  // console.log("API_URL:", API_URL);
+
   try {
-    const response = await fetch(`${API_URL}/patients`);
+    const response = await fetch(`${API_URL}/patients`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${authToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     patients.value = data;
   } catch (error) {
@@ -141,6 +154,11 @@ const deletePatient = (patient) => {
   // Implement delete functionality
   console.log("Delete patient:", patient);
 };
+
+// Fetch patients on component mount
+onMounted(() => {
+  fetchPatients();
+});
 </script>
 <template>
   <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto">

@@ -88,7 +88,7 @@ const role = ref("receptionist");
 
 const handleLogin = async () => {
   const API_URL = useRuntimeConfig().public.API_BASE_URL;
-  console.log("API_URL:", API_URL);
+  // console.log("API_URL:", API_URL);
   try {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
@@ -106,9 +106,10 @@ const handleLogin = async () => {
     console.log("Data:", data);
 
     if (response.status === 200) {
-      // Login successful
-      console.log("Login successful",);
-      // sessionStorage.setItem("token", response.data.token);
+      console.log("Login successful");
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("role", data.role);
+      sessionStorage.setItem("username", data.name);
       navigateTo("/dashboard");
     } else {
       // Login failed

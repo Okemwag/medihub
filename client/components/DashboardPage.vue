@@ -11,11 +11,21 @@ import {
   Menu,
   X,
 } from "lucide-vue-next";
-import PatientListModal from "./patientListModal.vue";
+// import PatientListModal from "./patientListModal.vue";
 
 const userName = ref("John Doe");
-const activeRole = ref("receptionist");
+const activeRole = ref(1);
 const sidebarOpen = ref(false);
+
+const displayUsername = sessionStorage.getItem("username");
+const userRole = sessionStorage.getItem("role");
+
+// console.log("userRole:", typeof(userRole), userRole);
+
+userName.value = displayUsername;
+activeRole.value = Number(userRole) || userRole;
+
+// console.log("activeRole:", typeof activeRole.value, activeRole.value);
 
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value;
@@ -39,11 +49,11 @@ const doctorMenuItems = [
 ];
 
 const menuItems = computed(() =>
-  activeRole.value === "receptionist" ? receptionistMenuItems : doctorMenuItems
+  activeRole.value === 2 ? receptionistMenuItems : doctorMenuItems
 );
 
 const dashboardCards = computed(() => {
-  if (activeRole.value === "receptionist") {
+  if (activeRole.value === 2) {
     return [
       {
         icon: UserPlus,
@@ -131,7 +141,8 @@ const closeModal = (modalName) => {
         <div>
           <h2 class="font-semibold">{{ userName }}</h2>
           <p class="text-xs text-gray-500">
-            {{ activeRole.charAt(0).toUpperCase() + activeRole.slice(1) }}
+            <!-- {{ activeRole.charAt(0).toUpperCase() + activeRole.slice(1) }} -->
+            {{ activeRole === 2 ? "Receptionist" : "Doctor" }}
           </p>
         </div>
       </div>
@@ -166,13 +177,14 @@ const closeModal = (modalName) => {
         <div>
           <h2 class="font-semibold">{{ userName }}</h2>
           <p class="text-sm text-gray-500">
-            {{ activeRole.charAt(0).toUpperCase() + activeRole.slice(1) }}
+            <!-- {{ activeRole.charAt(0).toUpperCase() + activeRole.slice(1) }} -->
+            {{ activeRole === 2 ? "Receptionist" : "Doctor" }}
           </p>
         </div>
       </div>
 
       <!-- Role Toggle -->
-      <div class="flex p-4 justify-center">
+      <!-- <div class="flex p-4 justify-center">
         <button
           v-for="role in ['receptionist', 'doctor']"
           :key="role"
@@ -186,7 +198,7 @@ const closeModal = (modalName) => {
         >
           {{ role.charAt(0).toUpperCase() + role.slice(1) }}
         </button>
-      </div>
+      </div> -->
 
       <!-- Menu Items  -->
       <nav class="p-2">
